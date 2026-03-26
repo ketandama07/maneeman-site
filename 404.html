@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Maneeman</title>
+    <script>
+        // GitHub Pages SPA redirect for clean URLs
+        const path = window.location.pathname;
+        if (path === '/privacy' || path === '/privacy/') {
+            window.location.replace('/privacy.html');
+        } else {
+            window.location.replace('/');
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>

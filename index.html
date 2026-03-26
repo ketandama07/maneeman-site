@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maneeman – Daily Dalali Manager</title>
+<meta name="description" content="Maneeman is a professional daily brokerage management app built for Indian commodity brokers. Track trades, manage buyers & sellers, generate reports.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-deep:  #0a2e1c;
+    --green-mid:   #1a5c3a;
+    --green-card:  #163a27;
+    --green-light: #2d7a55;
+    --gold:        #c9a84c;
+    --gold-light:  #e8c97a;
+    --gold-dim:    #a07a2e;
+    --cream:       #f5f0e8;
+    --muted:       rgba(245,240,232,0.55);
+    --gold-border: rgba(201,168,76,0.25);
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--green-deep);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(10,46,28,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gold-border);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold)) !important;
+    color: var(--green-deep) !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(201,168,76,0.10) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -55%);
+    pointer-events: none;
+  }
+
+  /* Corner ornaments */
+  .corner { position: absolute; width: 70px; height: 70px; border-color: var(--gold-border); border-style: solid; }
+  .c-tl { top:80px; left:48px; border-width:2px 0 0 2px; }
+  .c-tr { top:80px; right:48px; border-width:2px 2px 0 0; }
+  .c-bl { bottom:48px; left:48px; border-width:0 0 2px 2px; }
+  .c-br { bottom:48px; right:48px; border-width:0 2px 2px 0; }
+
+  .hero-content { position: relative; z-index: 2; max-width: 760px; }
+
+  .hero-badge {
+    display: inline-block;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    padding: 6px 16px; border-radius: 20px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(56px, 8vw, 96px);
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 4px;
+    line-height: 1;
+    margin-bottom: 16px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero-sub {
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 300;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-desc {
+    font-size: 17px; line-height: 1.8;
+    color: rgba(245,240,232,0.75);
+    max-width: 520px; margin: 0 auto 56px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .hero-btns {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    color: var(--green-deep);
+    padding: 16px 36px; border-radius: 10px;
+    font-size: 14px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+  .btn-outline {
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    padding: 16px 36px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; letter-spacing: 1.5px;
+    text-transform: uppercase; text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-outline:hover { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+
+  /* ── DIVIDER ── */
+  .gold-rule {
+    width: 200px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 0 auto;
+  }
+
+  /* ── FEATURES ── */
+  .section {
+    position: relative; z-index: 1;
+    padding: 100px 48px;
+    max-width: 1100px; margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold-dim); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::after {
+    content:''; flex:1; height:1px;
+    background: linear-gradient(90deg, var(--gold-border), transparent);
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4vw, 48px); font-weight: 700;
+    color: var(--gold-light); margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 16px; color: var(--muted); line-height: 1.7;
+    max-width: 520px; margin-bottom: 64px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--green-card);
+    border: 1px solid var(--gold-border);
+    border-radius: 20px; padding: 32px 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .feature-card:hover { border-color: rgba(201,168,76,0.5); transform: translateY(-3px); }
+
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 20px;
+  }
+
+  .feature-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--cream); margin-bottom: 10px;
+  }
+
+  .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  /* ── STATS ── */
+  .stats-section {
+    position: relative; z-index: 1;
+    background: var(--green-card);
+    border-top: 1px solid var(--gold-border);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 80px 48px;
+  }
+
+  .stats-grid {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 40px; text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 56px; font-weight: 700;
+    color: var(--gold-light); line-height: 1;
+  }
+
+  .stat-lbl {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); margin-top: 8px;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 32px; counter-reset: steps;
+  }
+
+  .step {
+    position: relative; padding-left: 0;
+  }
+
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px; font-weight: 700;
+    color: rgba(201,168,76,0.12); line-height: 1;
+    margin-bottom: -12px;
+  }
+
+  .step-title {
+    font-size: 16px; font-weight: 600; color: var(--cream);
+    margin-bottom: 8px;
+  }
+
+  .step-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    position: relative; z-index: 1;
+    text-align: center; padding: 100px 48px;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(201,168,76,0.07) 0%, transparent 70%);
+  }
+
+  .cta-section .section-title { margin-bottom: 24px; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--gold-border);
+    padding: 40px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--gold-light); letter-spacing: 2px;
+  }
+
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+  .footer-links a {
+    font-size: 12px; letter-spacing: 1px;
+    color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+
+  .footer-copy {
+    font-size: 11px; color: rgba(201,168,76,0.3);
+    letter-spacing: 1px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(24px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 640px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .section { padding: 70px 20px; }
+    .c-tl, .c-tr, .c-bl, .c-br { display: none; }
+    footer { flex-direction: column; text-align: center; padding: 32px 20px; }
+    .stats-section { padding: 60px 20px; }
+    .cta-section { padding: 70px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">MANEEMAN</a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="#contact" class="nav-cta">Contact Us</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="corner c-tl"></div>
+  <div class="corner c-tr"></div>
+  <div class="corner c-bl"></div>
+  <div class="corner c-br"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">Daily Dalali Manager · v1.0</div>
+    <h1 class="hero-title">MANEEMAN</h1>
+    <p class="hero-sub">Professional Brokerage Management</p>
+    <p class="hero-desc">
+      Built for Indian commodity brokers. Track daily trades, manage buyers & sellers,
+      generate brokerage reports — all from your phone.
+    </p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">✦ Get Started</a>
+      <a href="#features" class="btn-outline">See Features →</a>
+    </div>
+  </div>
+</section>
+
+<div class="gold-rule"></div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-label">What We Offer</div>
+  <h2 class="section-title">Everything a Dalal needs</h2>
+  <p class="section-sub">One app to manage your entire brokerage business — entries, masters, reports and backups.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📝</div>
+      <div class="feature-title">Daily Entry</div>
+      <p class="feature-desc">Log buyer, seller, item, bags, rate and brokerage in seconds. Auto-calculates totals. Works fully offline.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <div class="feature-title">Buyer & Seller Masters</div>
+      <p class="feature-desc">Maintain a complete directory of buyers, sellers, items, places and groups. Auto-fill on entry.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Brokerage Reports</div>
+      <p class="feature-desc">Financial year summary, buyer/seller brokerage, weight distribution, daily reports — all exportable.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">☁️</div>
+      <div class="feature-title">Cloud Backup</div>
+      <p class="feature-desc">Securely back up your entire database to Google Drive. Restore anytime on any device.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">Works Offline</div>
+      <p class="feature-desc">No internet required for daily use. All data stored locally on your device. Sync when ready.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">Your Data, Your Device</div>
+      <p class="feature-desc">Data never leaves your phone without your permission. Export your SQLite database anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div>
+      <div class="stat-val">10,000+</div>
+      <div class="stat-lbl">Entries Supported</div>
+    </div>
+    <div>
+      <div class="stat-val">7</div>
+      <div class="stat-lbl">Report Types</div>
+    </div>
+    <div>
+      <div class="stat-val">100%</div>
+      <div class="stat-lbl">Offline First</div>
+    </div>
+    <div>
+      <div class="stat-val">₹0</div>
+      <div class="stat-lbl">Hidden Charges</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="section-label">Getting Started</div>
+  <h2 class="section-title">Up and running in minutes</h2>
+  <p class="section-sub">Simple onboarding, no training required. Built around the workflow brokers already know.</p>
+
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Install & Onboard</div>
+      <p class="step-desc">Download the app, set up your broker profile and add your buyers, sellers and items in the Masters section.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Log Daily Trades</div>
+      <p class="step-desc">Every morning, open the Dalali screen and add entries as trades happen. Takes under 30 seconds per entry.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">View Reports</div>
+      <p class="step-desc">Check your daily brokerage summary on the home screen. Generate detailed reports anytime from the Reports tab.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">Backup & Rest Easy</div>
+      <p class="step-desc">Tap Backup Now once a day. Your complete business data is safely stored on your Google Drive.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="section-label" style="justify-content:center;margin-bottom:24px">Get In Touch</div>
+  <h2 class="section-title">Ready to go digital?</h2>
+  <p style="font-size:16px;color:var(--muted);max-width:440px;margin:0 auto 40px;line-height:1.7;">
+    Contact us to get Maneeman set up for your brokerage.
+    Onboarding includes full data migration from your existing system.
+  </p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:48px">
+    <a href="mailto:maneeman@gmail.com" class="btn-primary">✉ Email Us</a>
+  </div>
+  <div class="gold-rule"></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">MANEEMAN</div>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Maneeman. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
